@@ -10,7 +10,10 @@ export const SELECTION = {
    *   T1 官方一手（官网、官方博客、机构）· T1_5 官方账号、准官方创作者 · T2 媒体与个人
    * 分级 EXCLUDE_MP 以及这里没有列出的分级，不参与精选评分（只进“全部动态”）。
    */
-  thresholds: { T1: 60, T1_5: 65, T2: 76 } as Record<string, number>,
+  // 临时值：按本站金融信源的实测分数分布下调（首轮 34 条发布稿打分落在 20–66）。
+  // 默认的 T1 60 / T1_5 65 / T2 76 是 AIHOT 在 AI 领域标定的，换行业后必须重新校准：
+  // 标 100–200 条"该选/不该选"，跑 scripts/eval-selection.ts，再回来改这里（见 docs/customize.md 第 5 节）。
+  thresholds: { T1: 50, T1_5: 55, T2: 60 } as Record<string, number>,
   /**
    * 没入选、但平均分高于这个数的资料，也用精选的写法（内容理解：标题、摘要、推荐理由）来写，
    * 其余用更便宜的“标题摘要翻译”。

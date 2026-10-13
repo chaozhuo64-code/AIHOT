@@ -8,19 +8,20 @@
 
 ## 内容类型
 
-`itemType` 必须七选一：
+`itemType` 必须八选一：
 
-- `model_release`：新模型或大版本更新
-- `product_launch`：新产品、工具或重大功能更新
-- `tool_or_prompt`：可直接复用的方法、Prompt、Skill 或技巧
-- `research_paper`：论文、研究或技术报告
-- `industry_event`：融资、收购、监管、诉讼、商业动作或人事
-- `opinion_analysis`：观点、行业判断、复盘或长访谈
-- `tutorial_explainer`：教程、科普、解读或评测
+- `policy_release`：监管规则、通知、口径或处罚的发布
+- `data_release`：官方经济金融数据的发布，或统计口径与基数调整
+- `market_move`：可指认的价格、成交或资金面变化
+- `corporate_event`：机构的经营、人事、股权、合规或战略动作
+- `product_launch`：产品发行、费率与条款调整、投融资等资金动作
+- `research_view`：研报、研究或分析报告
+- `opinion_analysis`：观点、判断、复盘或访谈
+- `guide_explainer`：科普、条款解读、避坑与方法指引
 
-优先级：发了模型选 model_release；发了工具选 product_launch；发了 Prompt 或方法选 tool_or_prompt；论文优先 research_paper；评测选 tutorial_explainer。
+优先级：监管部门发文件选 policy_release；官方出数据选 data_release；行情变化选 market_move；发产品、募资或调费率选 product_launch；研报优先 research_view；科普与操作指引选 guide_explainer。
 
-输出前检查 `itemType` 与第一个分类标签是否自洽：`model_release` 对应“模型发布”，`product_launch` 对应“产品更新”，`research_paper` 对应“论文/研究”，`industry_event` 对应“行业动态”或“政策/监管”，`opinion_analysis` 对应“大佬观点”或“现象/趋势”，`tutorial_explainer` 对应“教程/实践”或“评测/基准”。如果二者冲突，按当前材料的核心事件修正后再输出。
+输出前检查 `itemType` 与第一个分类标签是否自洽：`policy_release` 对应“政策监管”，`data_release` 对应“宏观数据”，`market_move` 对应“市场行情”，`corporate_event` 对应“机构动态”或“行业生态”，`product_launch` 对应“产品与资金”，`research_view` 对应“观点解读”，`opinion_analysis` 对应“观点解读”，`guide_explainer` 对应“解读科普”。如果二者冲突，按当前材料的核心事件修正后再输出。
 
 ## 作者角色
 
@@ -32,14 +33,14 @@
 
 ## 标签
 
-`tags` 输出 1–6 个字符串。第一个必须从以下分类标签中选一个：模型发布、产品更新、开源/仓库、论文/研究、教程/实践、大佬观点、评测/基准、安全/对齐、现象/趋势、行业动态、政策/监管、非AI/通用工具、其他。
+`tags` 输出 1–6 个字符串。第一个必须从以下分类标签中选一个：政策监管、宏观数据、市场行情、机构动态、行业生态、产品与资金、金融科技、观点解读、解读科普、其他。
 
 其后可选 0–5 个适用标签，并且只能来自以下两个白名单：
 
-- 主题：Agent、编码、推理、多模态、语音、视频、图像生成、RAG、端侧、数据/训练、搜索、部署/工程、开源生态、具身智能、MCP/工具调用
-- 实体：OpenAI、Anthropic、DeepSeek、DeepMind、Google、Meta、Microsoft、xAI、Hugging Face、GitHub、arXiv
+- 主题：A股、港股、美股、债券、商品/黄金、外汇、利率、公募基金、私募/资管、银行、保险、券商、信托、加密资产、数字支付、IPO/再融资、并购、财报、监管处罚、量化交易、信用/风险、房地产金融、美联储/海外
+- 实体：央行、证监会、金融监管总局、财政部、国家统计局、上交所、深交所、美联储、欧洲央行、国际货币基金组织
 
-正文中即使明确出现了 NVIDIA、Apple、阿里等其他实体，也不要把它们放进 `tags`。不要创造白名单之外的标签。没有适用的主题或实体时，只返回第一个分类标签；例如学校限制 AI 使用的监管新闻，不需要强行归到“编码”或“推理”。
+正文中即使明确出现了招商银行、蚂蚁集团等其他机构，也不要把它们放进 `tags`。不要创造白名单之外的标签。没有适用的主题或实体时，只返回第一个分类标签；例如面向个人储户的存款利率科普，不需要强行归到“银行”或“利率”。
 
 ## 候选阅读价值
 
@@ -59,4 +60,4 @@
 
 只返回合法 JSON，不要 Markdown，不要解释。顶层必须且只能包含以下六个字段：
 
-{"itemType":"product_launch","authorRole":"principal","tags":["产品更新","Agent"],"editorialJudgment":"原文给出了能力变化和开放入口，读者可以据此判断它会怎样改变现有工作流。","titleZh":"某产品发布智能体功能","summaryZh":"某产品发布新的智能体功能，给出了开放入口和主要能力变化。"}
+{"itemType":"product_launch","authorRole":"principal","tags":["产品与资金","公募基金"],"editorialJudgment":"原文给出了发行规模、费率与投向，读者可以据此判断它与同类产品的差别。","titleZh":"某基金公司发行一只聚焦半导体的指数基金","summaryZh":"某基金公司发行聚焦半导体产业链的指数基金，公布募集规模、管理费率与跟踪指数。"}

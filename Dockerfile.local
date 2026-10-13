@@ -1,0 +1,28 @@
+# 离线重建：以本地已有的 aihot-app 镜像为基底，不从 Docker Hub 拉基础镜像。
+# 用途：国内没有出网代理时重新构建（VPN 关闭时 registry-1.docker.io 不可达，
+# 而上游 Dockerfile 的 FROM node:24-trixie-slim 需要访问 registry）。
+# 用法（仓库根目录）：
+#   docker build -f Dockerfile.local -t aihot-app:latest .
+#   docker compose up -d
+# 注意：改动 Dockerfile 里的系统依赖或基础镜像版本时，仍需用上游 Dockerfile 重新构建一次。
+FROM aihot-app:latest
+USER root
+WORKDIR /app
+ARG NPM_REGISTRY=https://registry.npmmirror.com
+COPY package.json package-lock.json ./
+COPY apps/api/package.json apps/api/
+COPY apps/web/package.json apps/web/
+COPY apps/worker/package.json apps/worker/
+COPY packages/backend/package.json packages/backend/
+COPY packages/contracts/package.json packages/contracts/
+COPY industry/package.json industry/
+COPY site/package.json site/
+# 基础镜像带 ENV NODE_ENV=production，不加 --include=dev 就装不到 @react-router/dev，构建会报 react-router: not found。
+RUN npm ci --include=dev --no-audit --no-fund --registry=$NPM_REGISTRY
+COPY . .
+RUN npm run build -w @aihot/web && npm prune --omit=dev --no-audit --no-fund
+ENV NODE_ENV=production
+RUN mkdir -p /data && chown node:node /data
+USER node
+EXPOSE 3000
+CMD ["node", "apps/web/server.ts"]
